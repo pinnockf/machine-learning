@@ -17,18 +17,21 @@ def ldaLearn(X,y):
     # means - A d x k matrix containing learnt means for each of the k classes
     # covmat - A single d x d learnt covariance matrix 
     
-    # IMPLEMENT THIS METHOD   
+    # IMPLEMENT THIS METHOD 
+    numClass = int(np.max(y))
     d = np.shape(X)[1]
-    k = int(np.max(y))
+    means = np.empty((d, numClass));
+
+    covmat = np.zeros(d)
+    for i in range (1, numClass + 1):
+        c = np.where(y==i)[0]
+        trainData = X[c,:]
+        means[:, i-1] = np.mean(trainData, axis=0).transpose()
+        covmat = covmat + (np.shape(trainData)[0]-1) * np.cov(np.transpose(trainData))
+
+
+    covmat = (1.0/(np.shape(X)[0] - numClass)) * covmat;# - numClass));
     
-    means = np.zeros((d,k))
-    for i in range(1, k+1):
-        class_i = X[np.where(y==i)[0]]
-        means[:,i-1] = np.mean(class_i, axis = 0)
-              
-    covmat = np.cov(X, rowvar = False)
-    
-   
     return means,covmat
 
 def qdaLearn(X,y):
@@ -41,16 +44,7 @@ def qdaLearn(X,y):
     # covmats - A list of k d x d learnt covariance matrices for each of the k classes
     
     # IMPLEMENT THIS METHOD
-    d = np.shape(X)[1]
-    k = int(np.max(y))
-    
-    means = np.zeros((d,k))
-    covmats = []
-    for i in range(1, k+1):
-        class_i = X[np.where(y==i)[0]]
-        means[:,i-1] = np.mean(class_i, axis = 0)
-        covmats.append(np.cov(class_i, rowvar = False))
-        
+    covmats = None
     return means,covmats
 
 def ldaTest(means,covmat,Xtest,ytest):
@@ -61,26 +55,10 @@ def ldaTest(means,covmat,Xtest,ytest):
     # Outputs
     # acc - A scalar accuracy value
     # ypred - N x 1 column vector indicating the predicted labels
-    
-    # IMPLEMENT THIS METHOD
-    N = np.shape(Xtest)[0]
-    d = np.shape(Xtest)[1]
-    k = np.shape(means)[1]
-    ypred = []
-    for x in Xtest:
-        inv_covmat = np.linalg.inv(covmat)  
-        pred = []
-        #P_x = 0
-        for mu in range(k):         
-            XminusMu = x-means[:,mu]            
-            pred_i = 1/(np.power(2*np.pi, d/2)*np.power(np.linalg.det(covmat),1/2))* np.exp(-.5*((XminusMu.T).dot(inv_covmat).dot(XminusMu)))
-            pred.append(pred_i)
-            continue
-        k_max = np.where(pred == np.max(pred))[0]
-        ypred.append(k_max+1)
-    ypred = np.array(ypred)
-    acc = np.sum(ypred == ytest) / N
 
+    # IMPLEMENT THIS METHOD
+    acc = None
+    ypred = None
     return acc,ypred
 
 def qdaTest(means,covmats,Xtest,ytest):
@@ -93,23 +71,8 @@ def qdaTest(means,covmats,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
-    N = np.shape(Xtest)[0]
-    d = np.shape(Xtest)[1]
-    k = np.shape(means)[1]
-    ypred = []
-    for x in Xtest:
-        inv_covmats = np.linalg.inv(covmats)  
-        pred = []
-        #P_x = 0
-        for mu in range(k):         
-            XminusMu = x-means[:,mu]            
-            pred_i = 1/(np.power(2*np.pi, d/2)*np.power(np.linalg.det(covmats[mu]),1/2))* np.exp(-.5*((XminusMu.T).dot(inv_covmats[mu]).dot(XminusMu)))
-            pred.append(pred_i)
-            continue
-        k_max = np.where(pred == np.max(pred))[0]
-        ypred.append(k_max+1)
-    ypred = np.array(ypred)
-    acc = np.sum(ypred == ytest) / N
+    acc = None
+    ypred = None
     return acc,ypred
 
 def learnOLERegression(X,y):
@@ -118,7 +81,6 @@ def learnOLERegression(X,y):
     # y = N x 1                                                               
     # Output: 
     # w = d x 1 
-    
 	
     # IMPLEMENT THIS METHOD       
     w = None                                            
