@@ -1,4 +1,3 @@
-
 import numpy as np
 from scipy.optimize import minimize
 from scipy.io import loadmat
@@ -17,6 +16,7 @@ def ldaLearn(X,y):
     # means - A d x k matrix containing learnt means for each of the k classes
     # covmat - A single d x d learnt covariance matrix 
     
+
     # IMPLEMENT THIS METHOD   
     d = np.shape(X)[1]
     k = int(np.max(y))
@@ -28,6 +28,7 @@ def ldaLearn(X,y):
               
     covmat = np.cov(X, rowvar = False)    
    
+
     return means,covmat
 
 def qdaLearn(X,y):
@@ -40,6 +41,7 @@ def qdaLearn(X,y):
     # covmats - A list of k d x d learnt covariance matrices for each of the k classes
     
     # IMPLEMENT THIS METHOD
+
     d = np.shape(X)[1]
     k = int(np.max(y))
     
@@ -50,6 +52,7 @@ def qdaLearn(X,y):
         means[:,i-1] = np.mean(class_i, axis = 0)
         covmats.append(np.cov(class_i, rowvar = False))
         
+
     return means,covmats
 
 def ldaTest(means,covmat,Xtest,ytest):
@@ -62,6 +65,7 @@ def ldaTest(means,covmat,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
     
     # IMPLEMENT THIS METHOD
+
     N = np.shape(Xtest)[0]
     d = np.shape(Xtest)[1]
     k = np.shape(means)[1]
@@ -81,6 +85,7 @@ def ldaTest(means,covmat,Xtest,ytest):
     ypred = np.array(ypred)
     acc = np.sum(ypred == ytest) / N
 
+
     return acc,ypred
 
 def qdaTest(means,covmats,Xtest,ytest):
@@ -93,6 +98,7 @@ def qdaTest(means,covmats,Xtest,ytest):
     # ypred - N x 1 column vector indicating the predicted labels
 
     # IMPLEMENT THIS METHOD
+
     N = np.shape(Xtest)[0]
     d = np.shape(Xtest)[1]
     k = np.shape(means)[1]
@@ -110,6 +116,7 @@ def qdaTest(means,covmats,Xtest,ytest):
         ypred.append(k_select)
     ypred = np.array(ypred)
     acc = np.sum(ypred == ytest) / N
+
     return acc,ypred
 
 def learnOLERegression(X,y):
@@ -118,9 +125,11 @@ def learnOLERegression(X,y):
     # y = N x 1                                                               
     # Output: 
     # w = d x 1 
+
     	
     # IMPLEMENT THIS METHOD       
     w = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(y)                                         
+
     return w
 
 def learnRidgeRegression(X,y,lambd):
@@ -134,8 +143,10 @@ def learnRidgeRegression(X,y,lambd):
     d = np.shape(X)[1]                                                         
     I_d = np.identity(d)
 
+
     # IMPLEMENT THIS METHOD    
     w = np.linalg.inv(lambd*I_d + X.T.dot(X)).dot(X.T).dot(y)                                               
+
     return w
 
 def testOLERegression(w,Xtest,ytest):
@@ -149,8 +160,12 @@ def testOLERegression(w,Xtest,ytest):
     N = np.shape(Xtest)[0]
     
     # IMPLEMENT THIS METHOD
+
     mse = (1/N)*(ytest - Xtest.dot(w)).T.dot(ytest - Xtest.dot(w))
+
     return mse
+
+
 
 def regressionObjVal(w, X, y, lambd):
 
@@ -158,16 +173,18 @@ def regressionObjVal(w, X, y, lambd):
     # to w (vector) for the given data X and y and the regularization parameter
     # lambda                                                                  
 
+
     # IMPLEMENT THIS METHOD   
     w = np.reshape(w,(65,1))
-    error = (0.5*(y - X.dot(w)).T.dot(y - X.dot(w))) + (0.5 * lambd * w.T.dot(w))[0][0]
+    error = (0.5*(y - X.dot(w)).T.dot(y - X.dot(w))) + (0.5 * lambd * w.T.dot(w))
     
-    error_grad = -2 * X.T.dot(y-X.dot(w)) + 2 * lambd * w
+    error_grad = X.T.dot(X.dot(w) - y) + (lambd * w)
+    #error_grad = np.dot(np.transpose(X),((np.dot(X,w)-y)))+(np.multiply(lambd,w))
     error_grad = error_grad.flatten()
-
-
-    
-    
+#    error_grad = np.reshape(error_grad,(65,))
+  
+ 
+   
     return error, error_grad
 
 def mapNonLinear(x,p):
@@ -176,18 +193,25 @@ def mapNonLinear(x,p):
     # p - integer (>= 0)                                                       
     # Outputs:                                                                 
     # Xd - (N x (d+1)) 
-    p = 3
+    
     N = np.shape(x)[0]
     # IMPLEMENT THIS METHOD
+
     Xd = np.zeros((N,p+1))
     for i in range(0, p+1):
         Xd[:,i-1] = np.power(x,i)
+
     return Xd
 
 # Main script
 
+
 # Problem 1
 # load the sample data                                                                 
+
+## Problem 1
+## load the sample data                                                                 
+
 if sys.version_info.major == 2:
     X,y,Xtest,ytest = pickle.load(open('sample.pickle','rb'))
 else:
@@ -225,7 +249,9 @@ plt.contourf(x1,x2,zqdares.reshape((x1.shape[0],x2.shape[0])),alpha=0.3)
 plt.scatter(Xtest[:,0],Xtest[:,1],c=ytest)
 plt.title('QDA')
 
-#plt.show()
+
+plt.show()
+
 # Problem 2
 if sys.version_info.major == 2:
     X,y,Xtest,ytest = pickle.load(open('diabetes.pickle','rb'))
@@ -238,12 +264,15 @@ Xtest_i = np.concatenate((np.ones((Xtest.shape[0],1)), Xtest), axis=1)
 
 w = learnOLERegression(X,y)
 mle = testOLERegression(w,Xtest,ytest)
-
 w_i = learnOLERegression(X_i,y)
 mle_i = testOLERegression(w_i,Xtest_i,ytest)
+mle_train = testOLERegression(w,X,y)
+mle_i_train = testOLERegression(w_i,X_i,y)
 
-print('MSE without intercept '+str(mle))
-print('MSE with intercept '+str(mle_i))
+print('MSE without intercept training data : '+str(mle_train))
+print('MSE with intercept training data : '+str(mle_i_train))
+print('MSE without intercept test data: '+str(mle))
+print('MSE with intercept test data: '+str(mle_i))
 
 # Problem 3
 k = 101
@@ -264,6 +293,8 @@ plt.subplot(1, 2, 2)
 plt.plot(lambdas,mses3)
 plt.title('MSE for Test Data')
 
+
+
 plt.show()
 # Problem 4
 k = 101
@@ -271,7 +302,7 @@ lambdas = np.linspace(0, 1, num=k)
 i = 0
 mses4_train = np.zeros((k,1))
 mses4 = np.zeros((k,1))
-opts = {'maxiter' : 20}    # Preferred value.                                                
+opts = {'maxiter' : 100}    # Preferred value.                                                
 w_init = np.ones((X_i.shape[1],1))
 for lambd in lambdas:
     args = (X_i, y, lambd)
@@ -298,7 +329,7 @@ plt.show()
 
 # Problem 5
 pmax = 7
-lambda_opt = 0 # REPLACE THIS WITH lambda_opt estimated from Problem 3
+lambda_opt =0.06
 mses5_train = np.zeros((pmax,2))
 mses5 = np.zeros((pmax,2))
 for p in range(pmax):
