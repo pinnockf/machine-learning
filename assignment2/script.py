@@ -158,11 +158,16 @@ def regressionObjVal(w, X, y, lambd):
     # to w (vector) for the given data X and y and the regularization parameter
     # lambda                                                                  
 
-    # IMPLEMENT THIS METHOD      
-    error = None
-    error = ((1.0/(2.0 * X.shape[0])) * squaredSum(w, X, y)) + (.5 * lambd * np.dot(w.T, w))
-    error_grad = ((((-1.0 * np.dot(y.T, X)) + (np.dot(w.T, np.dot(X.T, X)))) / X.shape[0]) + (lambd * w)).flatten()
-    error_grad = None                                       
+    # IMPLEMENT THIS METHOD   
+    w = np.reshape(w,(65,1))
+    error = (0.5*(y - X.dot(w)).T.dot(y - X.dot(w))) + (0.5 * lambd * w.T.dot(w))[0][0]
+    
+    error_grad = -2 * X.T.dot(y-X.dot(w)) + 2 * lambd * w
+    error_grad = error_grad.flatten()
+
+
+    
+    
     return error, error_grad
 
 def mapNonLinear(x,p):
@@ -171,52 +176,55 @@ def mapNonLinear(x,p):
     # p - integer (>= 0)                                                       
     # Outputs:                                                                 
     # Xd - (N x (d+1)) 
-	
+    p = 3
+    N = np.shape(x)[0]
     # IMPLEMENT THIS METHOD
-    Xd = none
+    Xd = np.zeros((N,p+1))
+    for i in range(0, p+1):
+        Xd[:,i-1] = np.power(x,i)
     return Xd
 
 # Main script
 
-## Problem 1
-## load the sample data                                                                 
-#if sys.version_info.major == 2:
-#    X,y,Xtest,ytest = pickle.load(open('sample.pickle','rb'))
-#else:
-#    X,y,Xtest,ytest = pickle.load(open('sample.pickle','rb'),encoding = 'latin1')
-#
-## LDA
-#means,covmat = ldaLearn(X,y)
-#ldaacc,ldares = ldaTest(means,covmat,Xtest,ytest)
-#print('LDA Accuracy = '+str(ldaacc))
-## QDA
-#means,covmats = qdaLearn(X,y)
-#qdaacc,qdares = qdaTest(means,covmats,Xtest,ytest)
-#print('QDA Accuracy = '+str(qdaacc))
-#
-## plotting boundaries
-#x1 = np.linspace(-5,20,100)
-#x2 = np.linspace(-5,20,100)
-#xx1,xx2 = np.meshgrid(x1,x2)
-#xx = np.zeros((x1.shape[0]*x2.shape[0],2))
-#xx[:,0] = xx1.ravel()
-#xx[:,1] = xx2.ravel()
-#
-#fig = plt.figure(figsize=[12,6])
-#plt.subplot(1, 2, 1)
-#
-#zacc,zldares = ldaTest(means,covmat,xx,np.zeros((xx.shape[0],1)))
-#plt.contourf(x1,x2,zldares.reshape((x1.shape[0],x2.shape[0])),alpha=0.3)
-#plt.scatter(Xtest[:,0],Xtest[:,1],c=ytest)
-#plt.title('LDA')
-#
-#plt.subplot(1, 2, 2)
-#
-#zacc,zqdares = qdaTest(means,covmats,xx,np.zeros((xx.shape[0],1)))
-#plt.contourf(x1,x2,zqdares.reshape((x1.shape[0],x2.shape[0])),alpha=0.3)
-#plt.scatter(Xtest[:,0],Xtest[:,1],c=ytest)
-#plt.title('QDA')
-#
+# Problem 1
+# load the sample data                                                                 
+if sys.version_info.major == 2:
+    X,y,Xtest,ytest = pickle.load(open('sample.pickle','rb'))
+else:
+    X,y,Xtest,ytest = pickle.load(open('sample.pickle','rb'),encoding = 'latin1')
+
+# LDA
+means,covmat = ldaLearn(X,y)
+ldaacc,ldares = ldaTest(means,covmat,Xtest,ytest)
+print('LDA Accuracy = '+str(ldaacc))
+# QDA
+means,covmats = qdaLearn(X,y)
+qdaacc,qdares = qdaTest(means,covmats,Xtest,ytest)
+print('QDA Accuracy = '+str(qdaacc))
+
+# plotting boundaries
+x1 = np.linspace(-5,20,100)
+x2 = np.linspace(-5,20,100)
+xx1,xx2 = np.meshgrid(x1,x2)
+xx = np.zeros((x1.shape[0]*x2.shape[0],2))
+xx[:,0] = xx1.ravel()
+xx[:,1] = xx2.ravel()
+
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+
+zacc,zldares = ldaTest(means,covmat,xx,np.zeros((xx.shape[0],1)))
+plt.contourf(x1,x2,zldares.reshape((x1.shape[0],x2.shape[0])),alpha=0.3)
+plt.scatter(Xtest[:,0],Xtest[:,1],c=ytest)
+plt.title('LDA')
+
+plt.subplot(1, 2, 2)
+
+zacc,zqdares = qdaTest(means,covmats,xx,np.zeros((xx.shape[0],1)))
+plt.contourf(x1,x2,zqdares.reshape((x1.shape[0],x2.shape[0])),alpha=0.3)
+plt.scatter(Xtest[:,0],Xtest[:,1],c=ytest)
+plt.title('QDA')
+
 #plt.show()
 # Problem 2
 if sys.version_info.major == 2:
@@ -288,28 +296,28 @@ plt.legend(['Using scipy.minimize','Direct minimization'])
 plt.show()
 
 
-## Problem 5
-#pmax = 7
-#lambda_opt = 0 # REPLACE THIS WITH lambda_opt estimated from Problem 3
-#mses5_train = np.zeros((pmax,2))
-#mses5 = np.zeros((pmax,2))
-#for p in range(pmax):
-#    Xd = mapNonLinear(X[:,2],p)
-#    Xdtest = mapNonLinear(Xtest[:,2],p)
-#    w_d1 = learnRidgeRegression(Xd,y,0)
-#    mses5_train[p,0] = testOLERegression(w_d1,Xd,y)
-#    mses5[p,0] = testOLERegression(w_d1,Xdtest,ytest)
-#    w_d2 = learnRidgeRegression(Xd,y,lambda_opt)
-#    mses5_train[p,1] = testOLERegression(w_d2,Xd,y)
-#    mses5[p,1] = testOLERegression(w_d2,Xdtest,ytest)
-#
-#fig = plt.figure(figsize=[12,6])
-#plt.subplot(1, 2, 1)
-#plt.plot(range(pmax),mses5_train)
-#plt.title('MSE for Train Data')
-#plt.legend(('No Regularization','Regularization'))
-#plt.subplot(1, 2, 2)
-#plt.plot(range(pmax),mses5)
-#plt.title('MSE for Test Data')
-#plt.legend(('No Regularization','Regularization'))
-#plt.show()
+# Problem 5
+pmax = 7
+lambda_opt = 0 # REPLACE THIS WITH lambda_opt estimated from Problem 3
+mses5_train = np.zeros((pmax,2))
+mses5 = np.zeros((pmax,2))
+for p in range(pmax):
+    Xd = mapNonLinear(X[:,2],p)
+    Xdtest = mapNonLinear(Xtest[:,2],p)
+    w_d1 = learnRidgeRegression(Xd,y,0)
+    mses5_train[p,0] = testOLERegression(w_d1,Xd,y)
+    mses5[p,0] = testOLERegression(w_d1,Xdtest,ytest)
+    w_d2 = learnRidgeRegression(Xd,y,lambda_opt)
+    mses5_train[p,1] = testOLERegression(w_d2,Xd,y)
+    mses5[p,1] = testOLERegression(w_d2,Xdtest,ytest)
+
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(range(pmax),mses5_train)
+plt.title('MSE for Train Data')
+plt.legend(('No Regularization','Regularization'))
+plt.subplot(1, 2, 2)
+plt.plot(range(pmax),mses5)
+plt.title('MSE for Test Data')
+plt.legend(('No Regularization','Regularization'))
+plt.show()
