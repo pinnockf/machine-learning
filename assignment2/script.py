@@ -264,8 +264,10 @@ Xtest_i = np.concatenate((np.ones((Xtest.shape[0],1)), Xtest), axis=1)
 
 w = learnOLERegression(X,y)
 mle = testOLERegression(w,Xtest,ytest)
+
 w_i = learnOLERegression(X_i,y)
 mle_i = testOLERegression(w_i,Xtest_i,ytest)
+
 mle_train = testOLERegression(w,X,y)
 mle_i_train = testOLERegression(w_i,X_i,y)
 
@@ -293,6 +295,14 @@ plt.subplot(1, 2, 2)
 plt.plot(lambdas,mses3)
 plt.title('MSE for Test Data')
 
+
+fig = plt.figure(figsize=[12,6])
+plt.subplot(1, 2, 1)
+plt.plot(w_i)
+plt.title('Magnitudes of Weights Learnt using OLE')
+plt.subplot(1, 2, 2)
+plt.plot(w_l)
+plt.title('Magnitudes of Weights Learnt using Ridge Regression')
 
 
 plt.show()
