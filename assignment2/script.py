@@ -179,11 +179,7 @@ def regressionObjVal(w, X, y, lambd):
     error = (0.5*(y - X.dot(w)).T.dot(y - X.dot(w))) + (0.5 * lambd * w.T.dot(w))
     
     error_grad = X.T.dot(X.dot(w) - y) + (lambd * w)
-    #error_grad = np.dot(np.transpose(X),((np.dot(X,w)-y)))+(np.multiply(lambd,w))
     error_grad = error_grad.flatten()
-#    error_grad = np.reshape(error_grad,(65,))
-  
- 
    
     return error, error_grad
 
@@ -203,11 +199,7 @@ def mapNonLinear(x,p):
 
     return Xd
 
-# Main script
-
-
-# Problem 1
-# load the sample data                                                                 
+# Main script                                                               
 
 ## Problem 1
 ## load the sample data                                                                 
@@ -271,10 +263,10 @@ mle_i = testOLERegression(w_i,Xtest_i,ytest)
 mle_train = testOLERegression(w,X,y)
 mle_i_train = testOLERegression(w_i,X_i,y)
 
-print('MSE without intercept training data : '+str(mle_train))
-print('MSE with intercept training data : '+str(mle_i_train))
-print('MSE without intercept test data: '+str(mle))
-print('MSE with intercept test data: '+str(mle_i))
+print('MSE without intercept (Training data) : '+str(mle_train))
+print('MSE with intercept (Training data) : '+str(mle_i_train))
+print('MSE without intercept (Test data): '+str(mle))
+print('MSE with intercept (Test data): '+str(mle_i))
 
 # Problem 3
 k = 101
@@ -294,6 +286,10 @@ plt.title('MSE for Train Data')
 plt.subplot(1, 2, 2)
 plt.plot(lambdas,mses3)
 plt.title('MSE for Test Data')
+
+print('Optimal Lambda: ' + str(lambdas[np.argmin(mses3)]))
+print('MSE using Ridge Regression (Training Data): '+str(mses3[np.argmin(mses3)]))
+print('MSE using Ridge Regression (Test Data) : '+str(mses3_train[np.argmin(mses3)]))
 
 
 fig = plt.figure(figsize=[12,6])
@@ -322,6 +318,8 @@ for lambd in lambdas:
     mses4_train[i] = testOLERegression(w_l,X_i,y)
     mses4[i] = testOLERegression(w_l,Xtest_i,ytest)
     i = i + 1
+    
+
 fig = plt.figure(figsize=[12,6])
 plt.subplot(1, 2, 1)
 plt.plot(lambdas,mses4_train)
@@ -339,7 +337,7 @@ plt.show()
 
 # Problem 5
 pmax = 7
-lambda_opt =0.06
+lambda_opt = lambdas[np.argmin(mses3)]
 mses5_train = np.zeros((pmax,2))
 mses5 = np.zeros((pmax,2))
 for p in range(pmax):
